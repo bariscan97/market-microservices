@@ -6,14 +6,12 @@ import (
 	"cart-service/service"
 	"encoding/json"
 	"net/http"
-	
+
 	"github.com/google/uuid"
-	
 )
 
 type CartHandler struct {
 	cartCache *service.RedisClient
-	
 }
 
 func NewCustomerController(cartCache *service.RedisClient) *CartHandler {
@@ -22,7 +20,7 @@ func NewCustomerController(cartCache *service.RedisClient) *CartHandler {
 	}
 }
 
-func (cartHandler *CartHandler) X(w http.ResponseWriter, r *http.Request) {
+func (cartHandler *CartHandler) Buy(w http.ResponseWriter, r *http.Request) {
 	ID, err := uuid.Parse(r.Header.Get("X-User-ID"))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -36,12 +34,12 @@ func (cartHandler *CartHandler) X(w http.ResponseWriter, r *http.Request) {
 	// 	}
 	// }()
 	claim := map[string]string{
-		"customer_id" : r.Header.Get("X-User-Id"),
-		"email" : r.Header.Get("X-User-email"),
+		"customer_id": r.Header.Get("X-User-Id"),
+		"email":       r.Header.Get("X-User-email"),
 	}
 	if err := cartHandler.cartCache.PushToOrder(claim, ID); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return 
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -57,23 +55,23 @@ func (cartHandler *CartHandler) AddItemToCart(w http.ResponseWriter, r *http.Req
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-    var item models.CartItem
+	var item models.CartItem
 	decoder := json.NewDecoder(r.Body)
 	decoder.DisallowUnknownFields()
-	if err := decoder.Decode(&item) ; err != nil {
+	if err := decoder.Decode(&item); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	_ , err = uuid.Parse(item.ID)
+	_, err = uuid.Parse(item.ID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	
+
 	cart, err := cartHandler.cartCache.AddItemToCart(ID, item)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return 
+		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -89,13 +87,13 @@ func (cartHandler *CartHandler) GetCartByCustomerId(w http.ResponseWriter, r *ht
 	cart, err := cartHandler.cartCache.GetCartByCustomerId(ID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return 
+		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(cart)
 }
-    
+
 func (cartHandler *CartHandler) DeleteCartByCustomerId(w http.ResponseWriter, r *http.Request) {
 	ID, err := uuid.Parse(r.Header.Get("X-User-ID"))
 	if err != nil {
@@ -104,7 +102,7 @@ func (cartHandler *CartHandler) DeleteCartByCustomerId(w http.ResponseWriter, r 
 	}
 	if err := cartHandler.cartCache.ResetCartByCustomerId(ID); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return 
+		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -112,6 +110,3 @@ func (cartHandler *CartHandler) DeleteCartByCustomerId(w http.ResponseWriter, r 
 		"deleted": "successful",
 	})
 }
-
-
-

@@ -92,7 +92,7 @@ func main() {
 
 	r.HandleFunc("/",cartHandler.AddItemToCart).Methods("POST")
 	r.HandleFunc("/",cartHandler.GetCartByCustomerId).Methods("GET")
-	r.HandleFunc("/buy",cartHandler.X).Methods("GET")
+	r.HandleFunc("/buy",cartHandler.Buy).Methods("GET")
 	
 	go producer.Worker()
 	go consumers.Run()
