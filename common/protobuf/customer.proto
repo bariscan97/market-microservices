@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "grpc-example/common/protobuf";
+
+service CustomerService {
+    rpc GetCustomer(CustomerReq) returns (CustomerRes);
+}
+
+message CustomerReq {
+    string id = 1;
+}
+
+message CustomerRes {
+    string firstname = 1;
+    string lastname = 2; 
+    string address = 3;
+    string phone = 4;
+    string email = 5;
+}
+

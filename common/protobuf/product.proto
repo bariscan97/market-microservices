@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package pb;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "../services/inventory/grpc/pb";
+
+service ProductService {
+    rpc AllItemsExists(AllProductExistsReq) returns (AllProductExistsRes);
+    rpc GetAllProduct(GetAllProductRequest) returns (GetAllProductResponse);
+    rpc GetProductById(GetProductByIdRequest) returns (GetProductByIdResponse);
+}
+
+message Product {
+    string id = 1;                      
+    string name = 2;
+    string slug = 3;
+    string image_url = 4;
+    string category = 5;
+    string description = 6;
+    double price = 7;
+    int32 stock_quantity = 8;
+    bool is_active = 9;
+    google.protobuf.Timestamp created_at = 10;
+    google.protobuf.Timestamp updated_at = 11;
+}
+
+message GetAllProductRequest {
+    int32 page = 1;   
+    int32 limit = 2;  
+}
+
+message GetAllProductResponse {
+    repeated Product products = 1;  
+    int32 total_pages = 2;          
+    int32 current_page = 3;         
+    int32 total_items = 4;          
+}
+
+message GetProductByIdRequest {
+    string id = 1; 
+}
+
+message GetProductByIdResponse {
+    Product product = 1; 
+}
+
+message AllProductExistsReq {
+    repeated string id = 1;
+}   
+
+message AllProductExistsRes {
+    bool all_exist = 1;
+}
