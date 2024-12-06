@@ -4,7 +4,6 @@ import (
 	"catalog-service/cache"
 	"catalog-service/consumer"
 	"catalog-service/handler"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -50,11 +49,7 @@ func main() {
 	go consumer.Consumer(repo, conn)
 
 	r := mux.NewRouter() 
-	{	r.HandleFunc("/health",func(w http.ResponseWriter, r *http.Request) {
-			x := r.Header.Get("nane")
-			fmt.Println("hello",x)
-			json.NewEncoder(w).Encode("ok")
-		})
+	{	
 		r.HandleFunc("/products", productHandler.GetProducts).Methods("GET")
 		r.HandleFunc("/products/categories", productHandler.GetGategories).Methods("GET")
 		r.HandleFunc("/products/{id}",productHandler.GetProductById).Methods("GET")
